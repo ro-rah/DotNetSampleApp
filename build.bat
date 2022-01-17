@@ -5,7 +5,7 @@ echo Deleting existing build session Id file
 set SL_TOOLS_PATH=C:\bin\SL.DotNet-2.0.1.749\x64\
 set SL_AGENT="%SL_TOOLS_PATH%sl.dotnet.exe"
 
-set SL_PROXY=http://127.0.0.1:8888
+::set SL_PROXY=http://127.0.0.1:8888
 set SL_APP_NAME=BadassDemo
 set SL_BRANCH_NAME=master
 
@@ -15,10 +15,12 @@ For /f "tokens=1-2 delims=/: " %%a in ('time /t') do (set mytime=%%a%%b%TIME:~6,
 set SL_BUILD_NAME=%mydate%_%mytime%
 
 @rem Configure a new build session
-%SL_AGENT% config --TokenFile "%cd%\\sealights.token" --appName %SL_APP_NAME% --branchName %SL_BRANCH_NAME% --buildName %SL_BUILD_NAME% --includeNamespace MyCalculator,ns1 --proxy %SL_PROXY% --buildSessionIdFile buildSession --logEnabled true --ignoreCertificateErrors true
+::%SL_AGENT% config --TokenFile "%cd%\\sealights.token" --appName %SL_APP_NAME% --branchName %SL_BRANCH_NAME% --buildName %SL_BUILD_NAME% --includeNamespace MyCalculator,ns1 --proxy %SL_PROXY% --buildSessionIdFile buildSession --logEnabled true --ignoreCertificateErrors true
+%SL_AGENT% config --TokenFile "%cd%\\sealights.token" --appName %SL_APP_NAME% --branchName %SL_BRANCH_NAME% --buildName %SL_BUILD_NAME% --includeNamespace MyCalculator,ns1 --buildSessionIdFile buildSession --logEnabled true --ignoreCertificateErrors true
 pause
 @rem Prepare for MSBuild
-%SL_AGENT% prepareForMsBuild --TokenFile "%cd%\\sealights.token" --buildSessionIdFile buildSession --baseDir "%cd%" --workspacePath "%cd%" --proxy %SL_PROXY% --ignoreGeneratedCode true --logEnabled true --ignoreCertificateErrors true --excludedProjects *NUnit*,*XUnit*,*Tests*,*WebApplication*
+::%SL_AGENT% prepareForMsBuild --TokenFile "%cd%\\sealights.token" --buildSessionIdFile buildSession --baseDir "%cd%" --workspacePath "%cd%" --proxy %SL_PROXY% --ignoreGeneratedCode true --logEnabled true --ignoreCertificateErrors true --excludedProjects *NUnit*,*XUnit*,*Tests*,*WebApplication*
+%SL_AGENT% prepareForMsBuild --TokenFile "%cd%\\sealights.token" --buildSessionIdFile buildSession --baseDir "%cd%" --workspacePath "%cd%" --ignoreGeneratedCode true --logEnabled true --ignoreCertificateErrors true --excludedProjects *NUnit*,*XUnit*,*Tests*,*WebApplication*
 @rem Run MSBuild
 "%PROGRAMFILES(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe" DotNetSampleApp.sln /t:Rebuild
 @rem del after.DotNetSampleApp.sln.targets
